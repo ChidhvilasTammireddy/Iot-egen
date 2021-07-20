@@ -1,10 +1,7 @@
 
-"""Python sample for connecting to Google Cloud IoT Core via MQTT, using JWT.
-This example connects to Google Cloud IoT Core via MQTT, using a JWT for device
-authentication. After connecting, by default the device publishes 100 messages
-to the device's MQTT topic at a rate of one per second, and then exits.
-Before you run the sample, you must follow the instructions in the README
-for this sample.
+""" This Python script helps making a connection to GCP IoT core via MQTT protocol.
+Used JWT for device authentication. Post connection the device publishes 100 messages 
+to the topic created at rate of 1 msg/sec and then stops. 
 """
 
 import argparse
@@ -18,26 +15,24 @@ import paho.mqtt.client as mqtt
 import random
 
 def create_jwt(project_id, private_key_file, algorithm):
-    """Creates a JWT (https://jwt.io) to establish an MQTT connection.
-        Args:
-         project_id: The cloud project ID this device belongs to
-         private_key_file: A path to a file containing either an RSA256 or
-                 ES256 private key.
-         algorithm: The encryption algorithm to use. Either 'RS256' or 'ES256'
-        Returns:
-            An MQTT generated from the given project_id and private key, which
-            expires in 20 minutes. After 20 minutes, your client will be
-            disconnected, and a new JWT will have to be generated.
-        Raises:
-            ValueError: If the private_key_file does not contain a known key.
-        """
+    """ This function creates a JWT to make a MQTT connection with GCP. 
+    It takes in following
+    Args:
+        project_id: The project we're developing the data pipeline.
+        private_key_file: path to 'RS256' private key.
+        algorithm: The encryption algorithm to use (in our case 'RS256')
+    Returns:
+        This function returns an MQTT generated from the given project_id and private_key,
+        whose expiration is set to 20 mins and past that the client will be disconnected.
+        And a new JWT will be generated.
+    """
 
     token = {
-            # The time that the token was issued at
+            # Token issue time
             'iat': datetime.datetime.utcnow(),
-            # The time the token expires.
+            # Token expiration time
             'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=60),
-            # The audience field should always be set to the GCP project id.
+            # Audience field is set to the project_id
             'aud': project_id
     }
 
@@ -126,7 +121,7 @@ def main():
     args = parse_command_line_args()
 
     # Create our MQTT client. The client_id is a unique string that identifies
-    # this device. For Google Cloud IoT Core, it must be in the format below.
+    # this device.
     client = mqtt.Client(
             client_id=('projects/{}/locations/{}/registries/{}/devices/{}'
                        .format(
